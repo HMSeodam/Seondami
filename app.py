@@ -232,10 +232,10 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 100px;
+                padding-bottom: 80px;
                 margin-bottom: 0;
-                max-height: calc(100vh - 100px);
-                height: calc(100vh - 100px);
+                max-height: calc(100vh - 80px);
+                height: calc(100vh - 80px);
                 -webkit-transform: translateZ(0);
                 transform: translateZ(0);
             }
@@ -322,7 +322,7 @@ def index():
             }
 
             .input-container {
-                padding: 1rem;
+                padding: 0.75rem 1rem;
                 background-color: white;
                 border-top: 1px solid #eee;
                 display: flex;
@@ -353,14 +353,18 @@ def index():
 
             @media screen and (max-width: 768px) {
                 .input-container {
-                    position: sticky;
-                    position: -webkit-sticky;
+                    position: fixed;
+                    bottom: 20px;
+                }
+
+                .disclaimer {
+                    bottom: 0;
                 }
 
                 .chat-container {
-                    height: calc(100vh - 100px - env(safe-area-inset-bottom));
-                    max-height: calc(100vh - 100px - env(safe-area-inset-bottom));
-                    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+                    height: calc(100vh - 100px);
+                    max-height: calc(100vh - 100px);
+                    padding-bottom: 100px;
                 }
             }
 
@@ -368,8 +372,11 @@ def index():
             @supports not (padding: env(safe-area-inset-bottom)) {
                 .input-container {
                     position: fixed;
+                    bottom: 20px;
+                }
+
+                .disclaimer {
                     bottom: 0;
-                    padding-bottom: 1rem;
                 }
 
                 .chat-container {
@@ -387,11 +394,20 @@ def index():
             }
 
             .disclaimer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
                 font-size: 0.7rem;
                 color: #666;
-                text-align: center;
-                width: 100%;
-                padding: 0.1rem 0;
+                padding: 0.25rem 0;
+                background-color: white;
+                z-index: 99;
+                max-width: 1000px;
+                margin: 0 auto;
+                box-sizing: border-box;
+                border-top: 1px solid #eee;
                 line-height: 1.2;
             }
 
@@ -523,9 +539,9 @@ def index():
                         </svg>
                     </div>
                 </div>
-                <div class="disclaimer">
-                    선다미의 대답이 틀릴 수 있습니다. 중요한 내용은 꼭 확인하세요.
-                </div>
+            </div>
+            <div class="disclaimer">
+                선다미의 대답이 틀릴 수 있습니다. 중요한 내용은 꼭 확인하세요.
             </div>
         </div>
 
