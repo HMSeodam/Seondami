@@ -490,7 +490,12 @@ def index():
                 if (message) {
                     addMessage(message, 'user');
                     userInput.value = '';
+                    
+                    // 로딩 애니메이션을 마지막 메시지 다음에 표시
                     loading.style.display = 'flex';
+                    const chatContainer = document.getElementById('chat-container');
+                    chatContainer.appendChild(loading);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
                     
                     fetch('/chat', {
                         method: 'POST',
