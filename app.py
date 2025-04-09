@@ -194,7 +194,7 @@ def index():
                 height: -webkit-fill-available;
                 height: stretch;
                 position: relative;
-                overflow: hidden; /* 컨테이너 내부에서만 스크롤 허용 */
+                overflow: hidden;
             }
 
             .header {
@@ -206,7 +206,7 @@ def index():
                 position: sticky;
                 top: 0;
                 z-index: 10;
-                flex-shrink: 0; /* 헤더 크기 고정 */
+                flex-shrink: 0;
             }
 
             .header h1 {
@@ -232,7 +232,8 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                margin-bottom: 60px; /* 입력창 높이보다 큰 여백 추가 */
+                padding-bottom: 80px; /* 입력창 높이보다 큰 여백 추가 */
+                margin-bottom: 0; /* 기존 margin-bottom 제거 */
             }
 
             .message {
@@ -324,14 +325,38 @@ def index():
                 gap: 0.75rem;
                 align-items: center;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-                position: fixed; /* sticky에서 fixed로 변경 */
+                position: fixed;
                 bottom: 0;
                 left: 0;
                 right: 0;
-                z-index: 100; /* 최상위로 설정 */
+                z-index: 100;
                 width: 100%;
                 max-width: 1000px;
                 margin: 0 auto;
+                box-sizing: border-box;
+            }
+
+            /* 안드로이드 브라우저 대응 */
+            @supports (padding: max(0px)) {
+                .input-container {
+                    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+                }
+                
+                .chat-container {
+                    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+                }
+            }
+
+            /* 모바일 확대/축소 기능 */
+            @media (max-width: 768px) {
+                .chat-container {
+                    touch-action: pan-y pinch-zoom;
+                    padding-bottom: 80px;
+                }
+
+                .message {
+                    font-size: calc(0.9rem * var(--zoom-level, 1));
+                }
             }
 
             #user-input {
@@ -722,7 +747,11 @@ def index():
                 }
                 
                 chatContainer.appendChild(messageDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // 메시지 추가 후 스크롤 위치 조정
+                setTimeout(() => {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 100);
             }
 
             document.getElementById('user-input').addEventListener('keypress', function(e) {
