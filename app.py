@@ -232,9 +232,9 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 110px; /* 입력창과 안내 멘트 높이를 합친 값 */
+                padding-bottom: 140px; /* 입력창과 안내 멘트 높이를 합친 값 + 여유 공간 */
                 margin-bottom: 0;
-                max-height: calc(100vh - 110px);
+                max-height: calc(100vh - 140px);
             }
 
             .message {
@@ -327,7 +327,7 @@ def index():
                 align-items: center;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
                 position: fixed;
-                bottom: 20px; /* 안내 멘트 높이만큼 위로 이동 */
+                bottom: 20px;
                 left: 0;
                 right: 0;
                 z-index: 100;
@@ -336,6 +336,7 @@ def index():
                 margin: 0 auto;
                 box-sizing: border-box;
                 transform: translateZ(0);
+                -webkit-transform: translateZ(0); /* 안드로이드 하드웨어 가속 */
             }
 
             .disclaimer {
@@ -363,8 +364,8 @@ def index():
                 }
                 
                 .chat-container {
-                    padding-bottom: calc(110px + env(safe-area-inset-bottom));
-                    max-height: calc(100vh - 110px - env(safe-area-inset-bottom));
+                    padding-bottom: calc(140px + env(safe-area-inset-bottom));
+                    max-height: calc(100vh - 140px - env(safe-area-inset-bottom));
                 }
 
                 .disclaimer {
@@ -732,18 +733,22 @@ def index():
                     const maxScroll = scrollHeight - clientHeight;
                     
                     if (maxScroll > 0) {
-                        // 마지막 메시지가 입력창 위에 보이도록 스크롤 위치 조정
-                        const lastMessage = chatContainer.lastElementChild;
-                        const lastMessageRect = lastMessage.getBoundingClientRect();
-                        const inputContainer = document.querySelector('.input-container');
-                        const inputRect = inputContainer.getBoundingClientRect();
+                        // 안드로이드 대응: 추가 여유 공간 확보
+                        const extraSpace = 40; // 추가 여유 공간
+                        chatContainer.scrollTop = maxScroll + extraSpace;
                         
-                        if (lastMessageRect.bottom > inputRect.top) {
-                            const scrollAdjustment = lastMessageRect.bottom - inputRect.top + 10;
-                            chatContainer.scrollTop = maxScroll + scrollAdjustment;
-                        } else {
-                            chatContainer.scrollTop = maxScroll;
-                        }
+                        // 스크롤 후 위치 확인 및 추가 조정
+                        requestAnimationFrame(() => {
+                            const lastMessage = chatContainer.lastElementChild;
+                            const lastMessageRect = lastMessage.getBoundingClientRect();
+                            const inputContainer = document.querySelector('.input-container');
+                            const inputRect = inputContainer.getBoundingClientRect();
+                            
+                            if (lastMessageRect.bottom > inputRect.top) {
+                                const additionalSpace = lastMessageRect.bottom - inputRect.top + 20;
+                                chatContainer.scrollTop = maxScroll + additionalSpace;
+                            }
+                        });
                     }
                 }, 100);
             }
