@@ -232,9 +232,9 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 140px; /* 입력창과 안내 멘트 높이를 합친 값 + 여유 공간 */
+                padding-bottom: calc(180px + env(safe-area-inset-bottom));
                 margin-bottom: 0;
-                max-height: calc(100vh - 140px);
+                max-height: calc(100vh - (180px + env(safe-area-inset-bottom)));
             }
 
             .message {
@@ -255,7 +255,7 @@ def index():
             }
 
             .message.playing {
-                background-color: rgba(107, 78, 113, 0.1); /* 재생 중일 때 배경색 변경 */
+                background-color: rgba(107, 78, 113, 0.1);
             }
 
             .user-message {
@@ -327,21 +327,21 @@ def index():
                 align-items: center;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
                 position: fixed;
-                bottom: 20px;
+                bottom: calc(20px + env(safe-area-inset-bottom));
                 left: 0;
                 right: 0;
-                z-index: 100;
+                z-index: 102;
                 width: 100%;
                 max-width: 1000px;
                 margin: 0 auto;
                 box-sizing: border-box;
                 transform: translateZ(0);
-                -webkit-transform: translateZ(0); /* 안드로이드 하드웨어 가속 */
+                -webkit-transform: translateZ(0);
             }
 
             .disclaimer {
                 position: fixed;
-                bottom: 0;
+                bottom: calc(60px + 20px + env(safe-area-inset-bottom));
                 left: 0;
                 right: 0;
                 text-align: center;
@@ -349,36 +349,18 @@ def index():
                 color: #666;
                 padding: 0.5rem 1rem;
                 background-color: white;
-                z-index: 99;
+                z-index: 101;
                 max-width: 1000px;
                 margin: 0 auto;
                 box-sizing: border-box;
                 border-top: 1px solid #eee;
             }
 
-            /* 안드로이드 브라우저 대응 */
-            @supports (padding: max(0px)) {
-                .input-container {
-                    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-                    bottom: calc(20px + env(safe-area-inset-bottom));
-                }
-                
-                .chat-container {
-                    padding-bottom: calc(140px + env(safe-area-inset-bottom));
-                    max-height: calc(100vh - 140px - env(safe-area-inset-bottom));
-                }
-
-                .disclaimer {
-                    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
-                }
-            }
-
-            /* 모바일 확대/축소 기능 */
             @media (max-width: 768px) {
                 .chat-container {
                     touch-action: pan-y pinch-zoom;
-                    padding-bottom: 120px;
-                    max-height: calc(100vh - 120px);
+                    padding-bottom: calc(180px + env(safe-area-inset-bottom));
+                    max-height: calc(100vh - (180px + env(safe-area-inset-bottom)));
                 }
 
                 .message {
@@ -455,7 +437,6 @@ def index():
                 100% { transform: scale(1); }
             }
 
-            /* 스크롤바 스타일 */
             .chat-container::-webkit-scrollbar {
                 width: 6px;
             }
@@ -775,4 +756,4 @@ def index():
 if __name__ == '__main__':
     # 환경 변수에서 포트 가져오기 (Heroku 등에서 사용)
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True) 
+    app.run(host='0.0.0.0', port=port, debug=True)
