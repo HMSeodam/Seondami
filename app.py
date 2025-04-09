@@ -112,355 +112,216 @@ def kakao_chat():
         })
 
 @app.route('/')
-def home():
+def index():
     return '''
     <!DOCTYPE html>
     <html>
     <head>
         <title>선다미 · 불교 신행 · 교리 상담 챗봇</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
         <style>
-            :root {
-                --primary-color: #6B4E71;
-                --secondary-color: #A8D5BA;
-                --background-color: #F5F5F5;
-                --text-color: #333333;
-                --chat-bubble-user: #E3F2FD;
-                --chat-bubble-bot: #F1F1F1;
-            }
-
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
             body {
                 font-family: 'Noto Sans KR', sans-serif;
-                background-color: var(--background-color);
-                color: var(--text-color);
-                line-height: 1.6;
+                margin: 0;
+                padding: 20px;
+                background-color: #f5f5f5;
             }
-
             .container {
                 max-width: 1000px;
                 margin: 0 auto;
+                background-color: white;
                 padding: 20px;
-                height: 100vh;
-                display: flex;
-                flex-direction: column;
+                border-radius: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
-
-            header {
+            .header {
                 text-align: center;
-                padding: 20px 0;
-                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-                color: white;
-                border-radius: 15px;
-                margin-bottom: 20px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                width: 100%;
+                margin-bottom: 30px;
             }
-
-            h1 {
-                font-size: 2.5rem;
-                font-weight: 700;
+            .header h1 {
+                color: #333;
                 margin-bottom: 10px;
             }
-
-            .subtitle {
-                font-size: 1.2rem;
-                opacity: 0.9;
-            }
-
-            .chat-container {
-                flex-grow: 1;
-                background-color: white;
-                border-radius: 15px;
-                padding: 20px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-                width: 100%;
-            }
-
-            #chat-messages {
-                flex-grow: 1;
-                overflow-y: auto;
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .message {
-                max-width: 80%;
-                padding: 15px;
-                border-radius: 15px;
-                position: relative;
-                animation: fadeIn 0.3s ease-in-out;
-            }
-
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-
-            .user-message {
-                background-color: var(--chat-bubble-user);
-                margin-left: auto;
-                border-bottom-right-radius: 5px;
-            }
-
-            .bot-message {
-                background-color: var(--chat-bubble-bot);
-                margin-right: auto;
-                border-bottom-left-radius: 5px;
-            }
-
-            .input-container {
-                display: flex;
-                gap: 10px;
-                padding: 20px;
-                background-color: white;
-                border-top: 1px solid #eee;
-                width: 100%;
-            }
-
-            .input-wrapper {
-                flex-grow: 1;
-                position: relative;
-                min-width: 0;
-            }
-
-            .disclaimer {
-                font-size: 0.8rem;
+            .header p {
                 color: #666;
-                margin-top: 5px;
-                text-align: center;
+                margin-top: 0;
             }
-
-            #chat-input {
-                width: 100%;
-                padding: 15px;
-                border: 2px solid #eee;
-                border-radius: 25px;
-                font-size: 1rem;
-                transition: border-color 0.3s;
+            .chat-container {
+                max-width: 1000px;
+                height: 500px;
+                overflow-y: auto;
+                border: 1px solid #ddd;
+                padding: 20px;
+                margin-bottom: 20px;
+                background-color: #fff;
+                border-radius: 10px;
             }
-
-            #chat-input:focus {
-                outline: none;
-                border-color: var(--primary-color);
-            }
-
-            .button-container {
+            .input-container {
+                max-width: 1000px;
                 display: flex;
                 gap: 10px;
-                flex-shrink: 0;
+                align-items: center;
             }
-
+            #user-input {
+                flex: 1;
+                padding: 12px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+            }
             button {
-                padding: 15px 25px;
+                padding: 12px 20px;
+                background-color: #4CAF50;
+                color: white;
                 border: none;
-                border-radius: 25px;
+                border-radius: 5px;
                 cursor: pointer;
-                font-size: 1rem;
-                font-weight: 500;
-                transition: all 0.3s;
+                font-size: 16px;
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+            .voice-btn {
+                background-color: #f44336;
+                padding: 12px;
+                border-radius: 50%;
+                width: 45px;
+                height: 45px;
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s;
             }
-
-            .send-button {
-                background-color: var(--primary-color);
-                color: white;
+            .voice-btn.recording {
+                background-color: #ff0000;
+                animation: pulse 1.5s infinite;
             }
-
-            .voice-button {
-                background-color: var(--secondary-color);
-                color: var(--text-color);
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
             }
-
-            button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-
-            .loading {
-                display: none;
+            .disclaimer {
                 text-align: center;
+                color: #666;
+                font-size: 12px;
+                margin-top: 10px;
+            }
+            .message {
+                margin-bottom: 15px;
                 padding: 10px;
-                color: var(--primary-color);
+                border-radius: 5px;
             }
-
-            .typing-indicator {
-                display: flex;
-                gap: 5px;
-                padding: 10px;
-                background-color: var(--chat-bubble-bot);
-                border-radius: 15px;
-                width: fit-content;
-                margin: 10px 0;
+            .user-message {
+                background-color: #e3f2fd;
+                margin-left: 20%;
             }
-
-            .typing-indicator span {
-                width: 8px;
-                height: 8px;
-                background-color: var(--primary-color);
-                border-radius: 50%;
-                animation: typing 1s infinite;
-            }
-
-            .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-            .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-            @keyframes typing {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-5px); }
-            }
-
-            @media (max-width: 768px) {
-                .container {
-                    padding: 10px;
-                }
-
-                h1 {
-                    font-size: 2rem;
-                }
-
-                .message {
-                    max-width: 90%;
-                }
-
-                button {
-                    padding: 12px 20px;
-                }
+            .bot-message {
+                background-color: #f5f5f5;
+                margin-right: 20%;
             }
         </style>
     </head>
     <body>
         <div class="container">
-            <header>
+            <div class="header">
                 <h1>선다미</h1>
-                <div class="subtitle">불교 신행 · 교리 상담 챗봇</div>
-            </header>
-            
-            <div class="chat-container">
-                <div id="chat-messages"></div>
-                <div class="loading" id="loading">
-                    <div class="typing-indicator">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
+                <p>불교 신행 · 교리 상담 챗봇</p>
+            </div>
+            <div class="chat-container" id="chat-container"></div>
+            <div class="input-container">
+                <input type="text" id="user-input" placeholder="메시지를 입력하세요...">
+                <button onclick="sendMessage()">전송</button>
+                <div class="voice-btn" id="voice-btn" onclick="toggleVoiceRecognition()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
+                    </svg>
                 </div>
-                <div class="input-container">
-                    <div class="input-wrapper">
-                        <input type="text" id="chat-input" placeholder="메시지를 입력하세요...">
-                        <div class="disclaimer">선다미의 대답이 틀릴 수 있습니다. 중요한 내용은 꼭 확인하세요.</div>
-                    </div>
-                    <div class="button-container">
-                        <button class="voice-button" onclick="startVoiceRecognition()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                <line x1="12" y1="19" x2="12" y2="23"></line>
-                                <line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
-                        </button>
-                        <button class="send-button" onclick="sendMessage()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="22" y1="2" x2="11" y2="13"></line>
-                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+            </div>
+            <div class="disclaimer">
+                선다미의 대답이 틀릴 수 있습니다. 중요한 내용은 꼭 확인하세요.
             </div>
         </div>
 
         <script>
             let recognition = null;
-            
-            // 음성 인식 초기화
-            if ('webkitSpeechRecognition' in window) {
-                recognition = new webkitSpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                recognition.lang = 'ko-KR';
+            let isRecording = false;
 
-                recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById('chat-input').value = transcript;
-                    sendMessage();
-                };
+            function toggleVoiceRecognition() {
+                const voiceBtn = document.getElementById('voice-btn');
+                
+                if (!recognition) {
+                    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                    recognition.lang = 'ko-KR';
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
 
-                recognition.onerror = function(event) {
-                    console.error('음성 인식 오류:', event.error);
-                };
-            }
+                    recognition.onresult = function(event) {
+                        const transcript = event.results[0][0].transcript;
+                        document.getElementById('user-input').value = transcript;
+                        isRecording = false;
+                        voiceBtn.classList.remove('recording');
+                    };
 
-            function startVoiceRecognition() {
-                if (recognition) {
+                    recognition.onerror = function(event) {
+                        console.error('Speech recognition error', event.error);
+                        isRecording = false;
+                        voiceBtn.classList.remove('recording');
+                    };
+
+                    recognition.onend = function() {
+                        isRecording = false;
+                        voiceBtn.classList.remove('recording');
+                    };
+                }
+
+                if (!isRecording) {
                     recognition.start();
-                    document.querySelector('.voice-button').style.backgroundColor = '#ff4444';
+                    isRecording = true;
+                    voiceBtn.classList.add('recording');
                 } else {
-                    alert('이 브라우저에서는 음성 인식을 지원하지 않습니다.');
+                    recognition.stop();
+                    isRecording = false;
+                    voiceBtn.classList.remove('recording');
                 }
             }
 
             function sendMessage() {
-                const input = document.getElementById('chat-input');
-                const message = input.value;
-                if (message.trim() === '') return;
-
-                // 사용자 메시지 표시
-                displayMessage(message, 'user');
-                input.value = '';
+                const userInput = document.getElementById('user-input');
+                const message = userInput.value.trim();
                 
-                // 로딩 표시
-                document.getElementById('loading').style.display = 'block';
-
-                // 서버에 메시지 전송
-                fetch('/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({message: message})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // 로딩 숨기기
-                    document.getElementById('loading').style.display = 'none';
+                if (message) {
+                    addMessage(message, 'user');
+                    userInput.value = '';
                     
-                    if (data.error) {
-                        displayMessage('죄송합니다. 오류가 발생했습니다.', 'bot');
-                    } else {
-                        displayMessage(data.response, 'bot');
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('loading').style.display = 'none';
-                    displayMessage('죄송합니다. 오류가 발생했습니다.', 'bot');
-                });
+                    fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({message: message})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        addMessage(data.response, 'bot');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        addMessage('죄송합니다. 오류가 발생했습니다.', 'bot');
+                    });
+                }
             }
 
-            function displayMessage(message, sender) {
-                const chatMessages = document.getElementById('chat-messages');
+            function addMessage(text, sender) {
+                const chatContainer = document.getElementById('chat-container');
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${sender}-message`;
-                messageDiv.textContent = message;
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                messageDiv.textContent = text;
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
 
-            // 엔터 키로 메시지 전송
-            document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            document.getElementById('user-input').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     sendMessage();
                 }
