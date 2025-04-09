@@ -232,7 +232,7 @@ def index():
                 display: none;
                 position: fixed;
                 left: 1rem;
-                bottom: 7rem;
+                bottom: 12rem;
                 gap: 0.4rem;
                 z-index: 1000;
             }
@@ -359,7 +359,7 @@ def index():
                 }
 
                 .loading {
-                    bottom: 6.5rem;
+                    bottom: 8.5rem;
                 }
             }
 
