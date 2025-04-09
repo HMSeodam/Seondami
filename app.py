@@ -232,9 +232,9 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 100px; /* 입력창과 안내 멘트 높이를 합친 값 */
+                padding-bottom: 110px; /* 입력창과 안내 멘트 높이를 합친 값 */
                 margin-bottom: 0;
-                max-height: calc(100vh - 100px);
+                max-height: calc(100vh - 110px);
             }
 
             .message {
@@ -363,8 +363,8 @@ def index():
                 }
                 
                 .chat-container {
-                    padding-bottom: calc(100px + env(safe-area-inset-bottom));
-                    max-height: calc(100vh - 100px - env(safe-area-inset-bottom));
+                    padding-bottom: calc(110px + env(safe-area-inset-bottom));
+                    max-height: calc(100vh - 110px - env(safe-area-inset-bottom));
                 }
 
                 .disclaimer {
