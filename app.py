@@ -119,106 +119,198 @@ def index():
     <head>
         <title>선다미 · 불교 신행 · 교리 상담 챗봇</title>
         <style>
+            :root {
+                --primary-color: #6B4E71;
+                --secondary-color: #A8D5BA;
+                --background-color: #F5F5F5;
+                --text-color: #333333;
+                --chat-bubble-user: #E3F2FD;
+                --chat-bubble-bot: #F1F1F1;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
             body {
                 font-family: 'Noto Sans KR', sans-serif;
-                margin: 0;
-                padding: 20px;
-                background-color: #f5f5f5;
+                background-color: var(--background-color);
+                color: var(--text-color);
+                line-height: 1.6;
+                padding: 10px;
             }
+
             .container {
                 max-width: 1000px;
                 margin: 0 auto;
                 background-color: white;
-                padding: 20px;
+                padding: 15px;
                 border-radius: 10px;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
+
             .header {
                 text-align: center;
-                margin-bottom: 30px;
+                margin-bottom: 20px;
             }
+
             .header h1 {
-                color: #333;
-                margin-bottom: 10px;
+                color: var(--primary-color);
+                font-size: 24px;
+                margin-bottom: 5px;
             }
+
             .header p {
                 color: #666;
-                margin-top: 0;
+                font-size: 14px;
             }
+
             .chat-container {
-                max-width: 1000px;
-                height: 500px;
+                width: 100%;
+                height: 60vh;
                 overflow-y: auto;
                 border: 1px solid #ddd;
-                padding: 20px;
-                margin-bottom: 20px;
+                padding: 15px;
+                margin-bottom: 15px;
                 background-color: #fff;
                 border-radius: 10px;
             }
+
             .input-container {
-                max-width: 1000px;
+                width: 100%;
                 display: flex;
-                gap: 10px;
+                gap: 8px;
                 align-items: center;
             }
+
             #user-input {
                 flex: 1;
-                padding: 12px;
+                padding: 10px;
                 border: 1px solid #ddd;
                 border-radius: 5px;
-                font-size: 16px;
+                font-size: 14px;
             }
+
             button {
-                padding: 12px 20px;
-                background-color: #4CAF50;
+                padding: 10px 15px;
+                background-color: var(--primary-color);
                 color: white;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
-                font-size: 16px;
+                font-size: 14px;
+                white-space: nowrap;
             }
-            button:hover {
-                background-color: #45a049;
-            }
+
             .voice-btn {
                 background-color: #f44336;
-                padding: 12px;
+                padding: 10px;
                 border-radius: 50%;
-                width: 45px;
-                height: 45px;
+                width: 40px;
+                height: 40px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
                 transition: all 0.3s;
             }
-            .voice-btn.recording {
-                background-color: #ff0000;
-                animation: pulse 1.5s infinite;
+
+            .voice-btn svg {
+                width: 20px;
+                height: 20px;
             }
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1); }
-                100% { transform: scale(1); }
-            }
+
             .disclaimer {
                 text-align: center;
                 color: #666;
-                font-size: 12px;
+                font-size: 11px;
                 margin-top: 10px;
+                padding: 0 10px;
             }
+
             .message {
-                margin-bottom: 15px;
-                padding: 10px;
-                border-radius: 5px;
+                margin-bottom: 10px;
+                padding: 8px 12px;
+                border-radius: 15px;
+                max-width: 85%;
+                word-wrap: break-word;
             }
+
             .user-message {
-                background-color: #e3f2fd;
-                margin-left: 20%;
+                background-color: var(--chat-bubble-user);
+                margin-left: auto;
+                border-bottom-right-radius: 5px;
             }
+
             .bot-message {
-                background-color: #f5f5f5;
-                margin-right: 20%;
+                background-color: var(--chat-bubble-bot);
+                margin-right: auto;
+                border-bottom-left-radius: 5px;
+            }
+
+            /* 모바일 최적화 */
+            @media (max-width: 768px) {
+                body {
+                    padding: 5px;
+                }
+
+                .container {
+                    padding: 10px;
+                }
+
+                .chat-container {
+                    height: 65vh;
+                    padding: 10px;
+                }
+
+                .header h1 {
+                    font-size: 20px;
+                }
+
+                .header p {
+                    font-size: 12px;
+                }
+
+                .message {
+                    font-size: 14px;
+                    max-width: 90%;
+                }
+
+                button {
+                    padding: 8px 12px;
+                    font-size: 12px;
+                }
+
+                .voice-btn {
+                    width: 35px;
+                    height: 35px;
+                    padding: 8px;
+                }
+
+                .voice-btn svg {
+                    width: 18px;
+                    height: 18px;
+                }
+            }
+
+            /* 스크롤바 스타일 */
+            .chat-container::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .chat-container::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            .chat-container::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 3px;
+            }
+
+            .chat-container::-webkit-scrollbar-thumb:hover {
+                background: #555;
             }
         </style>
     </head>
