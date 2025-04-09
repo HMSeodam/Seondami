@@ -212,21 +212,55 @@ def index():
                 border-color: var(--primary-color);
             }
 
-            button {
-                padding: 12px 20px;
+            .send-btn {
                 background-color: var(--primary-color);
                 color: white;
                 border: none;
-                border-radius: 25px;
+                border-radius: 50%;
+                width: 48px;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 cursor: pointer;
-                font-size: 16px;
-                font-family: var(--font-main);
-                font-weight: 500;
                 transition: all 0.3s;
+                padding: 0;
             }
 
-            button:active {
-                transform: scale(0.98);
+            .send-btn:active {
+                transform: scale(0.95);
+            }
+
+            .send-btn svg {
+                width: 24px;
+                height: 24px;
+                transform: rotate(-45deg);
+            }
+
+            .loading {
+                display: none;
+                justify-content: center;
+                align-items: center;
+                gap: 5px;
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .loading-dot {
+                width: 8px;
+                height: 8px;
+                background-color: var(--primary-color);
+                border-radius: 50%;
+                animation: loading 1.4s infinite ease-in-out;
+            }
+
+            .loading-dot:nth-child(1) { animation-delay: 0s; }
+            .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+            .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+            @keyframes loading {
+                0%, 80%, 100% { transform: scale(0); }
+                40% { transform: scale(1); }
             }
 
             .voice-btn {
@@ -359,12 +393,21 @@ def index():
             <div class="chat-container" id="chat-container"></div>
             <div class="input-container">
                 <input type="text" id="user-input" placeholder="메시지를 입력하세요...">
-                <button onclick="sendMessage()">전송</button>
+                <button class="send-btn" onclick="sendMessage()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
                 <div class="voice-btn" id="voice-btn" onclick="toggleVoiceRecognition()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
                         <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
                     </svg>
                 </div>
+            </div>
+            <div class="loading" id="loading">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
             </div>
             <div class="disclaimer">
                 선다미의 대답이 틀릴 수 있습니다. 중요한 내용은 꼭 확인하세요.
@@ -374,6 +417,11 @@ def index():
         <script>
             let recognition = null;
             let isRecording = false;
+
+            // 페이지 로드 시 인사말 표시
+            window.onload = function() {
+                addMessage("안녕하세요. 당신의 불교 신행 · 교리 도우미 '선다미'입니다. 만나서 반가워요! 무엇을 도와드릴까요?", 'bot');
+            };
 
             function toggleVoiceRecognition() {
                 const voiceBtn = document.getElementById('voice-btn');
@@ -417,10 +465,12 @@ def index():
             function sendMessage() {
                 const userInput = document.getElementById('user-input');
                 const message = userInput.value.trim();
+                const loading = document.getElementById('loading');
                 
                 if (message) {
                     addMessage(message, 'user');
                     userInput.value = '';
+                    loading.style.display = 'flex';
                     
                     fetch('/chat', {
                         method: 'POST',
@@ -431,10 +481,12 @@ def index():
                     })
                     .then(response => response.json())
                     .then(data => {
+                        loading.style.display = 'none';
                         addMessage(data.response, 'bot');
                     })
                     .catch(error => {
                         console.error('Error:', error);
+                        loading.style.display = 'none';
                         addMessage('죄송합니다. 오류가 발생했습니다.', 'bot');
                     });
                 }
