@@ -24,21 +24,31 @@ model = genai.GenerativeModel('gemini-1.5-flash')
 conversation_history = []
 
 # 시스템 프롬프트 설정
-SYSTEM_PROMPT = """당신은 '선다미'라는 이름의 불교 신행, 교리 상담 챗봇입니다. 
-주요 역할은 불교 신행과 교리 상담이지만, 사용자의 모든 질문에 대해 친절하게 답변해주세요.
+SYSTEM_PROMPT = """당신은 '선다미'라는 불교 신행, 교리 상담 챗봇입니다. 
+다음의 원칙을 따라 대화를 진행해주세요:
 
-주요 원칙:
-1. 불교 관련 질문에 대해서는 전문적이고 깊이 있는 답변을 제공합니다.
-2. 일상적인 질문(날씨, 건강, 일상 등)에도 친절하게 답변합니다.
-3. 상식적인 질문에는 정확한 정보를 제공합니다.
-4. 모든 답변은 친절하고 이해하기 쉽게 구성합니다.
-5. 불교적 관점에서 조언이 필요한 경우, 그에 대한 견해도 함께 제시합니다.
-6. 모호한 질문에는 명확한 설명을 요청합니다.
-7. 잘못된 정보를 제공하지 않도록 주의합니다.
-8. 이전 대화의 맥락을 고려하여 답변합니다.
-9. 답변할 때 마크다운 문법(*, ** 등)을 사용하지 않고 일반 텍스트로 작성합니다.
+1. 불교적 관점에서 답변하되, 현대적인 언어로 쉽게 설명해주세요.
+2. 답변은 간결하고 핵심적인 내용만 전달하되, 정보는 충실하게 제공해주세요.
+3. 이전 대화의 맥락을 반드시 고려하여 답변하세요:
+   - 사용자가 이전에 언급한 상황이나 문제를 기억하고 연관된 답변을 해주세요.
+   - 새로운 질문이 이전 대화와 관련이 있다면, 그 맥락을 유지하면서 답변해주세요.
+4. 사용자의 감정을 충분히 공감하고 이해하며, 따뜻한 마음으로 답변해주세요:
+   - 일상적인 고민 상담의 경우, 먼저 충분히 공감하고 이해하는 시간을 가져주세요.
+   - 해결책을 제시하기 전에 사용자의 마음을 잘 들어주세요.
+5. 불교 교리나 경전을 인용할 때는 출처를 명확히 밝혀주세요.
+6. 답변은 자연스러운 문장체로 작성해주세요:
+   - '상황 이해:', '불교적 관점:' 등의 구분 없이 자연스럽게 이어지도록
+   - 사용자의 마음을 공감하는 따뜻한 어조로
+   - 필요한 경우 숫자 리스트를 사용하여 정보를 구조화
+7. 모호한 질문에는 구체적인 예시를 들어 설명해주세요.
+8. 답변은 간결하고 명확하게, 필요한 경우에만 길게 설명해주세요.
+9. 사용자가 추가 질문을 할 때는 이전 대화의 맥락을 유지하면서 답변해주세요.
+10. 모든 답변은 현대적인 언어로, 친근하고 이해하기 쉽게 작성해주세요.
 
-대화를 시작하겠습니다."""
+이전 대화 내용:
+{context}
+
+이 내용을 참고하여 답변해주세요."""
 
 def get_chat_response(user_message):
     try:
@@ -134,6 +144,14 @@ def index():
                 --font-main: 'Noto Sans KR', 'Roboto', sans-serif;
                 --border-radius: 1rem;
                 --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                --nav-height: env(safe-area-inset-bottom);
+            }
+
+            /* 안드로이드 네비게이션 바 대응 */
+            @supports (padding: max(0px)) {
+                .input-container {
+                    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+                }
             }
 
             * {
@@ -214,6 +232,12 @@ def index():
                 font-size: 0.95rem;
                 line-height: 1.5;
                 position: relative;
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+
+            .message:active {
+                transform: scale(0.98);
             }
 
             .user-message {
@@ -226,6 +250,23 @@ def index():
                 background-color: var(--chat-bubble-bot);
                 margin-right: auto;
                 border-bottom-left-radius: 0.25rem;
+            }
+
+            .bot-message strong {
+                font-weight: 700;
+            }
+
+            .bot-message ol {
+                padding-left: 1rem;
+                margin: 0.5rem 0;
+            }
+
+            .bot-message li {
+                margin-bottom: 0.5rem;
+            }
+
+            .bot-message li::marker {
+                font-weight: 700;
             }
 
             .loading {
@@ -338,8 +379,7 @@ def index():
                 }
 
                 .message {
-                    font-size: 0.9rem;
-                    padding: 0.75rem 1rem;
+                    font-size: calc(0.9rem * var(--zoom-level, 1));
                 }
 
                 #user-input {
@@ -365,6 +405,10 @@ def index():
 
                 .loading {
                     padding: 0.75rem 1rem;
+                }
+
+                .chat-container {
+                    touch-action: pinch-zoom;
                 }
             }
 
@@ -437,6 +481,42 @@ def index():
         <script>
             let recognition = null;
             let isRecording = false;
+
+            // 음성 합성 설정
+            const synth = window.speechSynthesis;
+            let currentUtterance = null;
+
+            // 모바일 확대/축소 기능
+            let lastScale = 1;
+            let currentScale = 1;
+            const chatContainer = document.getElementById('chat-container');
+
+            chatContainer.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 2) {
+                    lastScale = currentScale;
+                }
+            });
+
+            chatContainer.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const currentDistance = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
+                    );
+                    const initialDistance = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
+                    );
+                    
+                    const scale = lastScale * (currentDistance / initialDistance);
+                    currentScale = Math.min(Math.max(scale, 0.8), 2);
+                    
+                    document.documentElement.style.setProperty('--zoom-level', currentScale);
+                }
+            });
 
             // 페이지 로드 시 인사말 표시
             window.onload = function() {
@@ -517,11 +597,31 @@ def index():
                 }
             }
 
+            // 메시지 클릭 시 음성 재생
+            function playMessage(message) {
+                if (currentUtterance) {
+                    synth.cancel();
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(message);
+                utterance.lang = 'ko-KR';
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                
+                currentUtterance = utterance;
+                synth.speak(utterance);
+            }
+
             function addMessage(text, sender) {
                 const chatContainer = document.getElementById('chat-container');
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${sender}-message`;
                 messageDiv.textContent = text;
+                
+                if (sender === 'bot') {
+                    messageDiv.addEventListener('click', () => playMessage(text));
+                }
+                
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
