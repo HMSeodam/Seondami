@@ -20,34 +20,38 @@ genai.configure(api_key=GOOGLE_API_KEY)
 # 모델 설정
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-# 안전 설정
-safety_settings = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_NONE"
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_NONE"
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_NONE"
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE"
-    }
-]
-
 # 대화 기록을 저장할 변수
 conversation_history = []
 
+# 시스템 프롬프트 설정
+SYSTEM_PROMPT = """당신은 '선다미'라는 불교 신행, 교리 상담 챗봇입니다. 
+다음의 원칙을 따라 대화를 진행해주세요:
+
+1. 불교적 관점에서 답변하되, 현대적인 언어로 쉽게 설명해주세요.
+2. 답변은 간결하고 핵심적인 내용만 전달하되, 정보는 충실하게 제공해주세요.
+3. 이전 대화의 맥락을 반드시 고려하여 답변하세요:
+   - 사용자가 이전에 언급한 상황이나 문제를 기억하고 연관된 답변을 해주세요.
+   - 새로운 질문이 이전 대화와 관련이 있다면, 그 맥락을 유지하면서 답변해주세요.
+4. 사용자의 감정을 충분히 공감하고 이해하며, 따뜻한 마음으로 답변해주세요:
+   - 일상적인 고민 상담의 경우, 먼저 충분히 공감하고 이해하는 시간을 가져주세요.
+   - 해결책을 제시하기 전에 사용자의 마음을 잘 들어주세요.
+5. 불교 교리나 경전을 인용할 때는 출처를 명확히 밝혀주세요.
+6. 답변은 자연스러운 문장체로 작성해주세요:
+   - '상황 이해:', '불교적 관점:' 등의 구분 없이 자연스럽게 이어지도록
+   - 사용자의 마음을 공감하는 따뜻한 어조로
+   - 필요한 경우 숫자 리스트를 사용하여 정보를 구조화
+7. 모호한 질문에는 구체적인 예시를 들어 설명해주세요.
+8. 답변은 간결하고 명확하게, 필요한 경우에만 길게 설명해주세요.
+9. 사용자가 추가 질문을 할 때는 이전 대화의 맥락을 유지하면서 답변해주세요.
+10. 모든 답변은 현대적인 언어로, 친근하고 이해하기 쉽게 작성해주세요.
+
+이전 대화 내용:
+{context}
+
+이 내용을 참고하여 답변해주세요."""
+
 def get_chat_response(user_message):
     try:
-        if not user_message.strip():
-            return "메시지를 입력해주세요."
-            
         # 대화 기록에 사용자 메시지 추가
         conversation_history.append(f"사용자: {user_message}")
         
@@ -55,47 +59,29 @@ def get_chat_response(user_message):
         recent_conversation = "\n".join(conversation_history[-5:])
         
         # 전체 프롬프트 구성
-        full_prompt = f"{SYSTEM_PROMPT}\n\n{recent_conversation}\n수행 메이트:"
+        full_prompt = f"{SYSTEM_PROMPT}\n\n{recent_conversation}\n선다미:"
         
-        # API 호출 시 안전 설정 적용
-        response = model.generate_content(
-            full_prompt,
-            safety_settings=safety_settings,
-            generation_config={
-                "temperature": 0.7,
-                "top_p": 0.8,
-                "top_k": 40,
-                "max_output_tokens": 1024,
-            }
-        )
+        response = model.generate_content(full_prompt)
         
-        if not response or not response.text:
-            print("API 응답이 비어있습니다.")
-            return "죄송합니다. 응답을 생성하는데 문제가 발생했습니다. 다시 시도해주세요."
-            
         # 마크다운 문법 제거
         clean_response = response.text.replace('*', '').replace('**', '')
         
         # 챗봇 응답을 대화 기록에 추가
-        conversation_history.append(f"수행 메이트: {clean_response}")
+        conversation_history.append(f"선다미: {clean_response}")
         
         return clean_response
     except Exception as e:
         print(f"Error: {str(e)}")
         print("Traceback:")
         print(traceback.format_exc())
-        return "죄송합니다. 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        return "죄송합니다. 오류가 발생했습니다."
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    try:
-        data = request.json
-        user_message = data.get('message', '')
-        response = get_chat_response(user_message)
-        return jsonify({'response': response})
-    except Exception as e:
-        print(f"Error in chat endpoint: {str(e)}")
-        return jsonify({'response': '죄송합니다. 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'})
+    data = request.json
+    user_message = data.get('message', '')
+    response = get_chat_response(user_message)
+    return jsonify({'response': response})
 
 # 카카오톡 챗봇 연동을 위한 엔드포인트
 @app.route('/kakao', methods=['POST'])
@@ -137,16 +123,11 @@ def kakao_chat():
 
 @app.route('/')
 def index():
-    # 대화 기록 초기화
-    global conversation_history
-    conversation_history = []
-    return f"""
+    return '''
     <!DOCTYPE html>
-    <html lang="ko">
+    <html>
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>수행 메이트 · 명상 수행 동반자</title>
+        <title>선다미 · 불교 신행 · 교리 상담 챗봇</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="mobile-web-app-capable" content="yes">
