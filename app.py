@@ -230,11 +230,11 @@ def index():
 
             .loading {
                 display: none;
-                position: absolute;
+                position: fixed;
                 left: 1rem;
-                top: 50%;
-                transform: translateY(-50%);
+                bottom: 5rem;
                 gap: 0.4rem;
+                z-index: 1000;
             }
 
             .loading-dot {
@@ -243,6 +243,15 @@ def index():
                 background-color: var(--primary-color);
                 border-radius: 50%;
                 animation: loading 1.4s infinite ease-in-out;
+            }
+
+            .loading-dot:nth-child(1) { animation-delay: 0s; }
+            .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+            .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+            @keyframes loading {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-0.5rem); }
             }
 
             .input-container {
@@ -348,16 +357,15 @@ def index():
                     font-size: 0.65rem;
                     padding: 0.4rem 0.75rem;
                 }
+
+                .loading {
+                    bottom: 4.5rem;
+                }
             }
 
             @keyframes fadeIn {
                 from { opacity: 0; transform: translateY(10px); }
                 to { opacity: 1; transform: translateY(0); }
-            }
-
-            @keyframes loading {
-                0%, 80%, 100% { transform: scale(0); }
-                40% { transform: scale(1); }
             }
 
             .voice-btn.recording {
