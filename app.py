@@ -119,6 +119,8 @@ def index():
     <head>
         <title>선다미 · 불교 신행 · 교리 상담 챗봇</title>
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap');
+
             :root {
                 --primary-color: #6B4E71;
                 --secondary-color: #A8D5BA;
@@ -126,90 +128,113 @@ def index():
                 --text-color: #333333;
                 --chat-bubble-user: #E3F2FD;
                 --chat-bubble-bot: #F1F1F1;
+                --font-main: 'Noto Sans KR', 'Roboto', sans-serif;
             }
 
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
             }
 
             body {
-                font-family: 'Noto Sans KR', sans-serif;
+                font-family: var(--font-main);
                 background-color: var(--background-color);
                 color: var(--text-color);
                 line-height: 1.6;
-                padding: 10px;
+                padding: 0;
+                margin: 0;
+                height: 100vh;
+                overflow: hidden;
             }
 
             .container {
-                max-width: 1000px;
+                max-width: 100%;
+                height: 100vh;
                 margin: 0 auto;
                 background-color: white;
-                padding: 15px;
-                border-radius: 10px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                padding: 0;
+                display: flex;
+                flex-direction: column;
             }
 
             .header {
                 text-align: center;
-                margin-bottom: 20px;
+                padding: 20px 15px;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
             }
 
             .header h1 {
-                color: var(--primary-color);
-                font-size: 24px;
+                font-size: 28px;
+                font-weight: 700;
                 margin-bottom: 5px;
+                letter-spacing: -0.5px;
             }
 
             .header p {
-                color: #666;
-                font-size: 14px;
+                font-size: 16px;
+                opacity: 0.9;
             }
 
             .chat-container {
-                width: 100%;
-                height: 60vh;
+                flex: 1;
                 overflow-y: auto;
-                border: 1px solid #ddd;
                 padding: 15px;
-                margin-bottom: 15px;
                 background-color: #fff;
-                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
             }
 
             .input-container {
-                width: 100%;
+                padding: 15px;
+                background-color: white;
+                border-top: 1px solid #eee;
                 display: flex;
-                gap: 8px;
+                gap: 10px;
                 align-items: center;
             }
 
             #user-input {
                 flex: 1;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                font-size: 14px;
+                padding: 12px 15px;
+                border: 2px solid #eee;
+                border-radius: 25px;
+                font-size: 16px;
+                font-family: var(--font-main);
+                transition: all 0.3s;
+            }
+
+            #user-input:focus {
+                outline: none;
+                border-color: var(--primary-color);
             }
 
             button {
-                padding: 10px 15px;
+                padding: 12px 20px;
                 background-color: var(--primary-color);
                 color: white;
                 border: none;
-                border-radius: 5px;
+                border-radius: 25px;
                 cursor: pointer;
-                font-size: 14px;
-                white-space: nowrap;
+                font-size: 16px;
+                font-family: var(--font-main);
+                font-weight: 500;
+                transition: all 0.3s;
+            }
+
+            button:active {
+                transform: scale(0.98);
             }
 
             .voice-btn {
-                background-color: #f44336;
-                padding: 10px;
+                background-color: var(--primary-color);
+                padding: 12px;
                 border-radius: 50%;
-                width: 40px;
-                height: 40px;
+                width: 48px;
+                height: 48px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -217,25 +242,38 @@ def index():
                 transition: all 0.3s;
             }
 
-            .voice-btn svg {
-                width: 20px;
-                height: 20px;
+            .voice-btn.recording {
+                background-color: #ff4444;
+                animation: pulse 1.5s infinite;
+            }
+
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
             }
 
             .disclaimer {
                 text-align: center;
                 color: #666;
-                font-size: 11px;
-                margin-top: 10px;
-                padding: 0 10px;
+                font-size: 12px;
+                padding: 10px 15px;
+                background-color: #f8f8f8;
             }
 
             .message {
-                margin-bottom: 10px;
-                padding: 8px 12px;
-                border-radius: 15px;
+                padding: 12px 16px;
+                border-radius: 18px;
                 max-width: 85%;
                 word-wrap: break-word;
+                animation: fadeIn 0.3s ease-out;
+                font-size: 16px;
+                line-height: 1.5;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
             }
 
             .user-message {
@@ -252,46 +290,44 @@ def index():
 
             /* 모바일 최적화 */
             @media (max-width: 768px) {
-                body {
-                    padding: 5px;
-                }
-
-                .container {
-                    padding: 10px;
-                }
-
-                .chat-container {
-                    height: 65vh;
-                    padding: 10px;
-                }
-
                 .header h1 {
-                    font-size: 20px;
+                    font-size: 24px;
                 }
 
                 .header p {
-                    font-size: 12px;
+                    font-size: 14px;
                 }
 
                 .message {
-                    font-size: 14px;
-                    max-width: 90%;
+                    font-size: 16px;
+                    padding: 10px 14px;
+                }
+
+                #user-input {
+                    font-size: 16px;
+                    padding: 10px 15px;
                 }
 
                 button {
-                    padding: 8px 12px;
-                    font-size: 12px;
+                    padding: 10px 15px;
+                    font-size: 14px;
                 }
 
                 .voice-btn {
-                    width: 35px;
-                    height: 35px;
-                    padding: 8px;
+                    width: 44px;
+                    height: 44px;
+                    padding: 10px;
                 }
+            }
 
-                .voice-btn svg {
-                    width: 18px;
-                    height: 18px;
+            /* iOS Safari 최적화 */
+            @supports (-webkit-touch-callout: none) {
+                body {
+                    height: -webkit-fill-available;
+                }
+                
+                .container {
+                    height: -webkit-fill-available;
                 }
             }
 
