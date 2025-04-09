@@ -232,8 +232,8 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 120px; /* 입력창 높이보다 큰 여백 추가 */
-                margin-bottom: 0;
+                padding-bottom: 80px; /* 입력창 높이보다 큰 여백 추가 */
+                margin-bottom: 0; /* 기존 margin-bottom 제거 */
             }
 
             .message {
@@ -334,7 +334,6 @@ def index():
                 max-width: 1000px;
                 margin: 0 auto;
                 box-sizing: border-box;
-                transform: translateZ(0); /* 하드웨어 가속 활성화 */
             }
 
             /* 안드로이드 브라우저 대응 */
@@ -344,7 +343,7 @@ def index():
                 }
                 
                 .chat-container {
-                    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+                    padding-bottom: calc(80px + env(safe-area-inset-bottom));
                 }
             }
 
@@ -531,21 +530,11 @@ def index():
         <script>
             let recognition = null;
             let isRecording = false;
-            let isPlaying = false;
-            let synth = null; // 전역 변수로 변경
+            let isPlaying = false; // 음성 재생 상태 추적
 
-            // 음성 합성 초기화 함수
-            function initSpeechSynthesis() {
-                if (!synth) {
-                    synth = window.speechSynthesis;
-                    // 카카오톡에서 음성 합성 지원 확인
-                    if (synth) {
-                        console.log('Speech synthesis is supported');
-                    } else {
-                        console.log('Speech synthesis is not supported');
-                    }
-                }
-            }
+            // 음성 합성 설정
+            const synth = window.speechSynthesis;
+            let currentUtterance = null;
 
             // 모바일 확대/축소 기능
             let lastScale = 1;
@@ -587,10 +576,6 @@ def index():
             window.onload = function() {
                 // 세션 스토리지 초기화
                 sessionStorage.removeItem('conversation_history');
-                
-                // 음성 합성 초기화
-                initSpeechSynthesis();
-                
                 addMessage("안녕하세요. 당신의 불교 신행 · 교리 도우미 '선다미'입니다. 만나서 반가워요! 무엇을 도와드릴까요?", 'bot');
                 
                 // 페이지 가시성 변경 이벤트 리스너 추가
@@ -713,10 +698,6 @@ def index():
 
             // 메시지 클릭 시 음성 재생
             function playMessage(message, messageElement) {
-                if (!synth) {
-                    initSpeechSynthesis();
-                }
-
                 // 이미 재생 중인 메시지인 경우 중지
                 if (messageElement.classList.contains('playing')) {
                     stopVoicePlayback();
@@ -752,13 +733,7 @@ def index():
                 };
                 
                 currentUtterance = utterance;
-                
-                // 음성 합성 지원 확인 후 재생
-                if (synth) {
-                    synth.speak(utterance);
-                } else {
-                    console.log('Speech synthesis is not available');
-                }
+                synth.speak(utterance);
             }
 
             function addMessage(text, sender) {
