@@ -352,8 +352,8 @@ def index():
                 color: #666;
                 text-align: center;
                 width: 100%;
-                padding-top: 0.5rem;
-                line-height: 1.4;
+                padding: 0.1rem 0;
+                line-height: 1.2;
             }
 
             @media (max-width: 768px) {
