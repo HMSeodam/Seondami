@@ -232,9 +232,9 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: calc(180px + env(safe-area-inset-bottom));
+                padding-bottom: 120px; /* 입력창 높이만큼 여유 공간 확보 */
                 margin-bottom: 0;
-                max-height: calc(100vh - (180px + env(safe-area-inset-bottom)));
+                max-height: calc(100vh - 120px);
             }
 
             .message {
@@ -319,7 +319,7 @@ def index():
             }
 
             .input-container {
-                padding: 0.75rem 1rem;
+                padding: 1rem 1rem;
                 background-color: white;
                 border-top: 1px solid #eee;
                 display: flex;
@@ -327,33 +327,33 @@ def index():
                 align-items: center;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
                 position: fixed;
-                bottom: calc(20px + env(safe-area-inset-bottom));
+                bottom: 0;
                 left: 0;
                 right: 0;
-                z-index: 102;
+                z-index: 100;
                 width: 100%;
                 max-width: 1000px;
                 margin: 0 auto;
                 box-sizing: border-box;
                 transform: translateZ(0);
                 -webkit-transform: translateZ(0);
+                flex-direction: column;
+            }
+
+            .input-wrapper {
+                display: flex;
+                gap: 0.75rem;
+                width: 100%;
+                align-items: center;
             }
 
             .disclaimer {
-                position: fixed;
-                bottom: calc(60px + 20px + env(safe-area-inset-bottom));
-                left: 0;
-                right: 0;
-                text-align: center;
                 font-size: 0.7rem;
                 color: #666;
-                padding: 0.5rem 1rem;
-                background-color: white;
-                z-index: 101;
-                max-width: 1000px;
-                margin: 0 auto;
-                box-sizing: border-box;
-                border-top: 1px solid #eee;
+                text-align: center;
+                width: 100%;
+                padding-top: 0.5rem;
+                line-height: 1.4;
             }
 
             @media (max-width: 768px) {
@@ -469,20 +469,22 @@ def index():
                 </div>
             </div>
             <div class="input-container">
-                <input type="text" id="user-input" placeholder="메시지를 입력하세요...">
-                <button class="send-btn" onclick="sendMessage()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                    </svg>
-                </button>
-                <div class="voice-btn" id="voice-btn" onclick="toggleVoiceRecognition()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
-                    </svg>
+                <div class="input-wrapper">
+                    <input type="text" id="user-input" placeholder="메시지를 입력하세요...">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                    <div class="voice-btn" id="voice-btn" onclick="toggleVoiceRecognition()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
+                        </svg>
+                    </div>
                 </div>
-            </div>
-            <div class="disclaimer">
-                선다미의 대답이 틀릴 수 있습니다. 중요한 내용은 꼭 확인하세요.
+                <div class="disclaimer">
+                    선다미의 대답이 틀릴 수 있습니다. 중요한 내용은 꼭 확인하세요.
+                </div>
             </div>
         </div>
 
