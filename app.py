@@ -232,8 +232,9 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 80px; /* 입력창 높이보다 큰 여백 추가 */
-                margin-bottom: 0; /* 기존 margin-bottom 제거 */
+                padding-bottom: 120px;
+                margin-bottom: 0;
+                max-height: calc(100vh - 120px);
             }
 
             .message {
@@ -334,6 +335,7 @@ def index():
                 max-width: 1000px;
                 margin: 0 auto;
                 box-sizing: border-box;
+                transform: translateZ(0);
             }
 
             /* 안드로이드 브라우저 대응 */
@@ -343,7 +345,8 @@ def index():
                 }
                 
                 .chat-container {
-                    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+                    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+                    max-height: calc(100vh - 120px - env(safe-area-inset-bottom));
                 }
             }
 
@@ -351,11 +354,13 @@ def index():
             @media (max-width: 768px) {
                 .chat-container {
                     touch-action: pan-y pinch-zoom;
-                    padding-bottom: 80px;
+                    padding-bottom: 120px;
+                    max-height: calc(100vh - 120px);
                 }
 
                 .message {
                     font-size: calc(0.9rem * var(--zoom-level, 1));
+                    max-width: 85%;
                 }
             }
 
@@ -750,7 +755,13 @@ def index():
                 
                 // 메시지 추가 후 스크롤 위치 조정
                 setTimeout(() => {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    const scrollHeight = chatContainer.scrollHeight;
+                    const clientHeight = chatContainer.clientHeight;
+                    const maxScroll = scrollHeight - clientHeight;
+                    
+                    if (maxScroll > 0) {
+                        chatContainer.scrollTop = maxScroll;
+                    }
                 }, 100);
             }
 
