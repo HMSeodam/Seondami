@@ -132,6 +132,8 @@ def index():
                 --chat-bubble-user: #E3F2FD;
                 --chat-bubble-bot: #F1F1F1;
                 --font-main: 'Noto Sans KR', 'Roboto', sans-serif;
+                --border-radius: 1rem;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             }
 
             * {
@@ -147,7 +149,7 @@ def index():
 
             @media (max-width: 768px) {
                 html {
-                    font-size: 20px;
+                    font-size: 18px;
                 }
             }
 
@@ -175,20 +177,21 @@ def index():
 
             .header {
                 text-align: center;
-                padding: 1.5rem 1rem;
+                padding: 1rem;
                 background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
                 color: white;
+                box-shadow: var(--shadow);
             }
 
             .header h1 {
-                font-size: 1.75rem;
+                font-size: 1.5rem;
                 font-weight: 700;
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.25rem;
                 letter-spacing: -0.5px;
             }
 
             .header p {
-                font-size: 1rem;
+                font-size: 0.875rem;
                 opacity: 0.9;
             }
 
@@ -202,59 +205,76 @@ def index():
                 gap: 0.75rem;
             }
 
+            .message {
+                padding: 0.75rem 1rem;
+                border-radius: var(--border-radius);
+                max-width: 85%;
+                word-wrap: break-word;
+                animation: fadeIn 0.3s ease-out;
+                font-size: 0.95rem;
+                line-height: 1.5;
+                position: relative;
+            }
+
+            .user-message {
+                background-color: var(--chat-bubble-user);
+                margin-left: auto;
+                border-bottom-right-radius: 0.25rem;
+            }
+
+            .bot-message {
+                background-color: var(--chat-bubble-bot);
+                margin-right: auto;
+                border-bottom-left-radius: 0.25rem;
+            }
+
             .loading {
                 display: none;
-                justify-content: flex-start;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.75rem 1rem;
-                margin: 0.5rem 0;
-                background-color: var(--chat-bubble-bot);
-                border-radius: 1.125rem;
-                max-width: 85%;
-                margin-right: auto;
-                border-bottom-left-radius: 5px;
+                position: absolute;
+                left: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                gap: 0.4rem;
             }
 
             .loading-dot {
-                width: 0.5rem;
-                height: 0.5rem;
+                width: 0.4rem;
+                height: 0.4rem;
                 background-color: var(--primary-color);
                 border-radius: 50%;
                 animation: loading 1.4s infinite ease-in-out;
             }
 
-            .loading-dot:nth-child(1) { animation-delay: 0s; }
-            .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-            .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-            @keyframes loading {
-                0%, 80%, 100% { transform: scale(0); }
-                40% { transform: scale(1); }
-            }
-
             .input-container {
-                padding: 1rem;
+                padding: 0.75rem 1rem;
                 background-color: white;
                 border-top: 1px solid #eee;
                 display: flex;
                 gap: 0.75rem;
                 align-items: center;
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
             }
 
             #user-input {
                 flex: 1;
                 padding: 0.75rem 1rem;
                 border: 2px solid #eee;
-                border-radius: 1.5rem;
-                font-size: 1rem;
+                border-radius: var(--border-radius);
+                font-size: 0.95rem;
                 font-family: var(--font-main);
                 transition: all 0.3s;
+                background-color: #f8f8f8;
+            }
+
+            #user-input:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                background-color: white;
             }
 
             .send-btn, .voice-btn {
-                width: 3rem;
-                height: 3rem;
+                width: 2.75rem;
+                height: 2.75rem;
                 padding: 0.75rem;
                 border-radius: 50%;
                 display: flex;
@@ -262,84 +282,93 @@ def index():
                 justify-content: center;
                 cursor: pointer;
                 transition: all 0.3s;
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                box-shadow: var(--shadow);
+            }
+
+            .send-btn:hover, .voice-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .send-btn:active, .voice-btn:active {
+                transform: translateY(0);
             }
 
             .send-btn svg, .voice-btn svg {
-                width: 1.5rem;
-                height: 1.5rem;
-            }
-
-            .message {
-                padding: 0.75rem 1rem;
-                border-radius: 1.125rem;
-                max-width: 85%;
-                word-wrap: break-word;
-                animation: fadeIn 0.3s ease-out;
-                font-size: 1rem;
-                line-height: 1.5;
+                width: 1.25rem;
+                height: 1.25rem;
             }
 
             .disclaimer {
                 text-align: center;
                 color: #666;
-                font-size: 0.75rem;
-                padding: 0.75rem 1rem;
+                font-size: 0.7rem;
+                padding: 0.5rem 1rem;
                 background-color: #f8f8f8;
             }
 
-            /* 모바일 최적화 */
             @media (max-width: 768px) {
                 .header {
-                    padding: 1.25rem 0.75rem;
+                    padding: 0.75rem;
                 }
 
                 .header h1 {
-                    font-size: 1.5rem;
+                    font-size: 1.25rem;
                 }
 
                 .header p {
-                    font-size: 0.875rem;
+                    font-size: 0.75rem;
                 }
 
                 .message {
-                    font-size: 1rem;
+                    font-size: 0.9rem;
                     padding: 0.75rem 1rem;
                 }
 
                 #user-input {
-                    font-size: 1rem;
+                    font-size: 0.9rem;
                     padding: 0.75rem 1rem;
                 }
 
                 .send-btn, .voice-btn {
-                    width: 2.75rem;
-                    height: 2.75rem;
+                    width: 2.5rem;
+                    height: 2.5rem;
                     padding: 0.75rem;
                 }
 
                 .send-btn svg, .voice-btn svg {
-                    width: 1.25rem;
-                    height: 1.25rem;
+                    width: 1.1rem;
+                    height: 1.1rem;
+                }
+
+                .disclaimer {
+                    font-size: 0.65rem;
+                    padding: 0.4rem 0.75rem;
                 }
             }
 
-            /* iOS Safari 최적화 */
-            @supports (-webkit-touch-callout: none) {
-                body {
-                    height: -webkit-fill-available;
-                }
-                
-                .container {
-                    height: -webkit-fill-available;
-                }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
 
-                .header {
-                    padding-top: env(safe-area-inset-top);
-                }
+            @keyframes loading {
+                0%, 80%, 100% { transform: scale(0); }
+                40% { transform: scale(1); }
+            }
 
-                .input-container {
-                    padding-bottom: env(safe-area-inset-bottom);
-                }
+            .voice-btn.recording {
+                background-color: #ff4444;
+                animation: pulse 1.5s infinite;
+            }
+
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
             }
 
             /* 스크롤바 스타일 */
