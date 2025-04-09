@@ -118,6 +118,9 @@ def index():
     <html>
     <head>
         <title>선다미 · 불교 신행 · 교리 상담 챗봇</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap');
 
@@ -138,6 +141,16 @@ def index():
                 -webkit-tap-highlight-color: transparent;
             }
 
+            html {
+                font-size: 16px;
+            }
+
+            @media (max-width: 768px) {
+                html {
+                    font-size: 20px;
+                }
+            }
+
             body {
                 font-family: var(--font-main);
                 background-color: var(--background-color);
@@ -147,6 +160,7 @@ def index():
                 margin: 0;
                 height: 100vh;
                 overflow: hidden;
+                -webkit-text-size-adjust: 100%;
             }
 
             .container {
@@ -161,94 +175,50 @@ def index():
 
             .header {
                 text-align: center;
-                padding: 20px 15px;
+                padding: 1.5rem 1rem;
                 background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
                 color: white;
             }
 
             .header h1 {
-                font-size: 28px;
+                font-size: 1.75rem;
                 font-weight: 700;
-                margin-bottom: 5px;
+                margin-bottom: 0.5rem;
                 letter-spacing: -0.5px;
             }
 
             .header p {
-                font-size: 16px;
+                font-size: 1rem;
                 opacity: 0.9;
             }
 
             .chat-container {
                 flex: 1;
                 overflow-y: auto;
-                padding: 15px;
+                padding: 1rem;
                 background-color: #fff;
                 display: flex;
                 flex-direction: column;
-                gap: 12px;
-            }
-
-            .input-container {
-                padding: 15px;
-                background-color: white;
-                border-top: 1px solid #eee;
-                display: flex;
-                gap: 10px;
-                align-items: center;
-            }
-
-            #user-input {
-                flex: 1;
-                padding: 12px 15px;
-                border: 2px solid #eee;
-                border-radius: 25px;
-                font-size: 16px;
-                font-family: var(--font-main);
-                transition: all 0.3s;
-            }
-
-            #user-input:focus {
-                outline: none;
-                border-color: var(--primary-color);
-            }
-
-            .send-btn {
-                background-color: var(--primary-color);
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 48px;
-                height: 48px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all 0.3s;
-                padding: 0;
-            }
-
-            .send-btn:active {
-                transform: scale(0.95);
-            }
-
-            .send-btn svg {
-                width: 24px;
-                height: 24px;
-                transform: rotate(-45deg);
+                gap: 0.75rem;
             }
 
             .loading {
                 display: none;
-                justify-content: center;
+                justify-content: flex-start;
                 align-items: center;
-                gap: 5px;
-                padding: 10px;
-                margin: 10px 0;
+                gap: 0.5rem;
+                padding: 0.75rem 1rem;
+                margin: 0.5rem 0;
+                background-color: var(--chat-bubble-bot);
+                border-radius: 1.125rem;
+                max-width: 85%;
+                margin-right: auto;
+                border-bottom-left-radius: 5px;
             }
 
             .loading-dot {
-                width: 8px;
-                height: 8px;
+                width: 0.5rem;
+                height: 0.5rem;
                 background-color: var(--primary-color);
                 border-radius: 50%;
                 animation: loading 1.4s infinite ease-in-out;
@@ -263,12 +233,30 @@ def index():
                 40% { transform: scale(1); }
             }
 
-            .voice-btn {
-                background-color: var(--primary-color);
-                padding: 12px;
+            .input-container {
+                padding: 1rem;
+                background-color: white;
+                border-top: 1px solid #eee;
+                display: flex;
+                gap: 0.75rem;
+                align-items: center;
+            }
+
+            #user-input {
+                flex: 1;
+                padding: 0.75rem 1rem;
+                border: 2px solid #eee;
+                border-radius: 1.5rem;
+                font-size: 1rem;
+                font-family: var(--font-main);
+                transition: all 0.3s;
+            }
+
+            .send-btn, .voice-btn {
+                width: 3rem;
+                height: 3rem;
+                padding: 0.75rem;
                 border-radius: 50%;
-                width: 48px;
-                height: 48px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -276,81 +264,62 @@ def index():
                 transition: all 0.3s;
             }
 
-            .voice-btn.recording {
-                background-color: #ff4444;
-                animation: pulse 1.5s infinite;
+            .send-btn svg, .voice-btn svg {
+                width: 1.5rem;
+                height: 1.5rem;
             }
 
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1); }
-                100% { transform: scale(1); }
+            .message {
+                padding: 0.75rem 1rem;
+                border-radius: 1.125rem;
+                max-width: 85%;
+                word-wrap: break-word;
+                animation: fadeIn 0.3s ease-out;
+                font-size: 1rem;
+                line-height: 1.5;
             }
 
             .disclaimer {
                 text-align: center;
                 color: #666;
-                font-size: 12px;
-                padding: 10px 15px;
+                font-size: 0.75rem;
+                padding: 0.75rem 1rem;
                 background-color: #f8f8f8;
-            }
-
-            .message {
-                padding: 12px 16px;
-                border-radius: 18px;
-                max-width: 85%;
-                word-wrap: break-word;
-                animation: fadeIn 0.3s ease-out;
-                font-size: 16px;
-                line-height: 1.5;
-            }
-
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-
-            .user-message {
-                background-color: var(--chat-bubble-user);
-                margin-left: auto;
-                border-bottom-right-radius: 5px;
-            }
-
-            .bot-message {
-                background-color: var(--chat-bubble-bot);
-                margin-right: auto;
-                border-bottom-left-radius: 5px;
             }
 
             /* 모바일 최적화 */
             @media (max-width: 768px) {
+                .header {
+                    padding: 1.25rem 0.75rem;
+                }
+
                 .header h1 {
-                    font-size: 24px;
+                    font-size: 1.5rem;
                 }
 
                 .header p {
-                    font-size: 14px;
+                    font-size: 0.875rem;
                 }
 
                 .message {
-                    font-size: 16px;
-                    padding: 10px 14px;
+                    font-size: 1rem;
+                    padding: 0.75rem 1rem;
                 }
 
                 #user-input {
-                    font-size: 16px;
-                    padding: 10px 15px;
+                    font-size: 1rem;
+                    padding: 0.75rem 1rem;
                 }
 
-                button {
-                    padding: 10px 15px;
-                    font-size: 14px;
+                .send-btn, .voice-btn {
+                    width: 2.75rem;
+                    height: 2.75rem;
+                    padding: 0.75rem;
                 }
 
-                .voice-btn {
-                    width: 44px;
-                    height: 44px;
-                    padding: 10px;
+                .send-btn svg, .voice-btn svg {
+                    width: 1.25rem;
+                    height: 1.25rem;
                 }
             }
 
@@ -362,6 +331,14 @@ def index():
                 
                 .container {
                     height: -webkit-fill-available;
+                }
+
+                .header {
+                    padding-top: env(safe-area-inset-top);
+                }
+
+                .input-container {
+                    padding-bottom: env(safe-area-inset-bottom);
                 }
             }
 
@@ -390,7 +367,13 @@ def index():
                 <h1>선다미</h1>
                 <p>불교 신행 · 교리 상담 챗봇</p>
             </div>
-            <div class="chat-container" id="chat-container"></div>
+            <div class="chat-container" id="chat-container">
+                <div class="loading" id="loading">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            </div>
             <div class="input-container">
                 <input type="text" id="user-input" placeholder="메시지를 입력하세요...">
                 <button class="send-btn" onclick="sendMessage()">
@@ -403,11 +386,6 @@ def index():
                         <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
                     </svg>
                 </div>
-            </div>
-            <div class="loading" id="loading">
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
             </div>
             <div class="disclaimer">
                 선다미의 대답이 틀릴 수 있습니다. 중요한 내용은 꼭 확인하세요.
