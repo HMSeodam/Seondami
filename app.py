@@ -184,13 +184,16 @@ def index():
             }
 
             .container {
-                max-width: 100%;
-                height: 100vh;
+                max-width: 1000px;
                 margin: 0 auto;
                 background-color: white;
                 padding: 0;
                 display: flex;
                 flex-direction: column;
+                height: 100vh;
+                height: -webkit-fill-available;
+                height: stretch;
+                position: relative;
             }
 
             .header {
@@ -199,6 +202,9 @@ def index():
                 background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
                 color: white;
                 box-shadow: var(--shadow);
+                position: sticky;
+                top: 0;
+                z-index: 10;
             }
 
             .header h1 {
@@ -221,6 +227,9 @@ def index():
                 display: flex;
                 flex-direction: column;
                 gap: 0.75rem;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior-y: contain;
+                position: relative;
             }
 
             .message {
@@ -308,6 +317,10 @@ def index():
                 gap: 0.75rem;
                 align-items: center;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+                position: sticky;
+                bottom: 0;
+                z-index: 10;
+                width: 100%;
             }
 
             #user-input {
@@ -408,7 +421,7 @@ def index():
                 }
 
                 .chat-container {
-                    touch-action: pinch-zoom;
+                    touch-action: pan-y pinch-zoom;
                 }
             }
 
@@ -490,10 +503,18 @@ def index():
             let lastScale = 1;
             let currentScale = 1;
             const chatContainer = document.getElementById('chat-container');
+            let initialDistance = 0;
 
             chatContainer.addEventListener('touchstart', function(e) {
                 if (e.touches.length === 2) {
+                    e.preventDefault();
                     lastScale = currentScale;
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    initialDistance = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
+                    );
                 }
             });
 
@@ -503,10 +524,6 @@ def index():
                     const touch1 = e.touches[0];
                     const touch2 = e.touches[1];
                     const currentDistance = Math.hypot(
-                        touch2.clientX - touch1.clientX,
-                        touch2.clientY - touch1.clientY
-                    );
-                    const initialDistance = Math.hypot(
                         touch2.clientX - touch1.clientX,
                         touch2.clientY - touch1.clientY
                     );
@@ -520,6 +537,8 @@ def index():
 
             // 페이지 로드 시 인사말 표시
             window.onload = function() {
+                // 세션 스토리지 초기화
+                sessionStorage.removeItem('conversation_history');
                 addMessage("안녕하세요. 당신의 불교 신행 · 교리 도우미 '선다미'입니다. 만나서 반가워요! 무엇을 도와드릴까요?", 'bot');
             };
 
@@ -631,6 +650,15 @@ def index():
                     sendMessage();
                 }
             });
+
+            // 안드로이드 네비게이션 바 대응
+            function adjustForAndroidNav() {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+
+            window.addEventListener('resize', adjustForAndroidNav);
+            adjustForAndroidNav();
         </script>
     </body>
     </html>
