@@ -232,8 +232,9 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 80px; /* 입력창 높이보다 큰 여백 추가 */
-                margin-bottom: 0; /* 기존 margin-bottom 제거 */
+                padding-bottom: 120px; /* 입력창 높이만 고려 */
+                margin-bottom: 0;
+                max-height: calc(100vh - 120px);
             }
 
             .message {
@@ -326,7 +327,7 @@ def index():
                 align-items: center;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
                 position: fixed;
-                bottom: 0;
+                bottom: 40px; /* 안내 멘트 높이만큼 위로 이동 */
                 left: 0;
                 right: 0;
                 z-index: 100;
@@ -334,16 +335,40 @@ def index():
                 max-width: 1000px;
                 margin: 0 auto;
                 box-sizing: border-box;
+                transform: translateZ(0);
+            }
+
+            .disclaimer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 0.7rem;
+                color: #666;
+                padding: 0.5rem 1rem;
+                background-color: white;
+                z-index: 99;
+                max-width: 1000px;
+                margin: 0 auto;
+                box-sizing: border-box;
+                border-top: 1px solid #eee;
             }
 
             /* 안드로이드 브라우저 대응 */
             @supports (padding: max(0px)) {
                 .input-container {
                     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+                    bottom: calc(40px + env(safe-area-inset-bottom));
                 }
                 
                 .chat-container {
-                    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+                    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+                    max-height: calc(100vh - 120px - env(safe-area-inset-bottom));
+                }
+
+                .disclaimer {
+                    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
                 }
             }
 
@@ -351,11 +376,18 @@ def index():
             @media (max-width: 768px) {
                 .chat-container {
                     touch-action: pan-y pinch-zoom;
-                    padding-bottom: 80px;
+                    padding-bottom: 120px;
+                    max-height: calc(100vh - 120px);
                 }
 
                 .message {
                     font-size: calc(0.9rem * var(--zoom-level, 1));
+                    max-width: 85%;
+                }
+
+                .disclaimer {
+                    font-size: 0.65rem;
+                    padding: 0.4rem 0.75rem;
                 }
             }
 
@@ -404,61 +436,6 @@ def index():
             .send-btn svg, .voice-btn svg {
                 width: 1.25rem;
                 height: 1.25rem;
-            }
-
-            .disclaimer {
-                text-align: center;
-                color: #666;
-                font-size: 0.7rem;
-                padding: 0.5rem 1rem;
-                background-color: #f8f8f8;
-            }
-
-            @media (max-width: 768px) {
-                .header {
-                    padding: 0.75rem;
-                }
-
-                .header h1 {
-                    font-size: 1.25rem;
-                }
-
-                .header p {
-                    font-size: 0.75rem;
-                }
-
-                .message {
-                    font-size: calc(0.9rem * var(--zoom-level, 1));
-                }
-
-                #user-input {
-                    font-size: 0.9rem;
-                    padding: 0.75rem 1rem;
-                }
-
-                .send-btn, .voice-btn {
-                    width: 2.5rem;
-                    height: 2.5rem;
-                    padding: 0.75rem;
-                }
-
-                .send-btn svg, .voice-btn svg {
-                    width: 1.1rem;
-                    height: 1.1rem;
-                }
-
-                .disclaimer {
-                    font-size: 0.65rem;
-                    padding: 0.4rem 0.75rem;
-                }
-
-                .loading {
-                    padding: 0.75rem 1rem;
-                }
-
-                .chat-container {
-                    touch-action: pan-y pinch-zoom;
-                }
             }
 
             @keyframes fadeIn {
