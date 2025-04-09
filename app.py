@@ -194,6 +194,7 @@ def index():
                 height: -webkit-fill-available;
                 height: stretch;
                 position: relative;
+                overflow: hidden; /* 컨테이너 내부에서만 스크롤 허용 */
             }
 
             .header {
@@ -205,6 +206,7 @@ def index():
                 position: sticky;
                 top: 0;
                 z-index: 10;
+                flex-shrink: 0; /* 헤더 크기 고정 */
             }
 
             .header h1 {
@@ -230,6 +232,7 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
+                margin-bottom: 60px; /* 입력창 높이보다 큰 여백 추가 */
             }
 
             .message {
@@ -242,11 +245,15 @@ def index():
                 line-height: 1.5;
                 position: relative;
                 cursor: pointer;
-                transition: transform 0.2s;
+                transition: transform 0.2s, background-color 0.2s;
             }
 
             .message:active {
                 transform: scale(0.98);
+            }
+
+            .message.playing {
+                background-color: rgba(107, 78, 113, 0.1); /* 재생 중일 때 배경색 변경 */
             }
 
             .user-message {
@@ -317,10 +324,14 @@ def index():
                 gap: 0.75rem;
                 align-items: center;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-                position: sticky;
+                position: fixed; /* sticky에서 fixed로 변경 */
                 bottom: 0;
-                z-index: 10;
+                left: 0;
+                right: 0;
+                z-index: 100; /* 최상위로 설정 */
                 width: 100%;
+                max-width: 1000px;
+                margin: 0 auto;
             }
 
             #user-input {
@@ -494,6 +505,7 @@ def index():
         <script>
             let recognition = null;
             let isRecording = false;
+            let isPlaying = false; // 음성 재생 상태 추적
 
             // 음성 합성 설정
             const synth = window.speechSynthesis;
@@ -540,7 +552,50 @@ def index():
                 // 세션 스토리지 초기화
                 sessionStorage.removeItem('conversation_history');
                 addMessage("안녕하세요. 당신의 불교 신행 · 교리 도우미 '선다미'입니다. 만나서 반가워요! 무엇을 도와드릴까요?", 'bot');
+                
+                // 페이지 가시성 변경 이벤트 리스너 추가
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+                
+                // 페이지 언로드 이벤트 리스너 추가
+                window.addEventListener('beforeunload', handleBeforeUnload);
             };
+            
+            // 페이지 가시성 변경 처리
+            function handleVisibilityChange() {
+                if (document.hidden) {
+                    // 페이지가 숨겨질 때 음성 인식 중지
+                    stopVoiceRecognition();
+                    // 음성 재생 중지
+                    stopVoicePlayback();
+                }
+            }
+            
+            // 페이지 언로드 처리
+            function handleBeforeUnload() {
+                stopVoiceRecognition();
+                stopVoicePlayback();
+            }
+            
+            // 음성 인식 중지 함수
+            function stopVoiceRecognition() {
+                if (recognition && isRecording) {
+                    recognition.stop();
+                    isRecording = false;
+                    const voiceBtn = document.getElementById('voice-btn');
+                    voiceBtn.classList.remove('recording');
+                }
+            }
+            
+            // 음성 재생 중지 함수
+            function stopVoicePlayback() {
+                if (synth && isPlaying) {
+                    synth.cancel();
+                    isPlaying = false;
+                    // 재생 중인 메시지의 배경색 제거
+                    const playingMessages = document.querySelectorAll('.message.playing');
+                    playingMessages.forEach(msg => msg.classList.remove('playing'));
+                }
+            }
 
             function toggleVoiceRecognition() {
                 const voiceBtn = document.getElementById('voice-btn');
@@ -617,15 +672,40 @@ def index():
             }
 
             // 메시지 클릭 시 음성 재생
-            function playMessage(message) {
-                if (currentUtterance) {
-                    synth.cancel();
+            function playMessage(message, messageElement) {
+                // 이미 재생 중인 메시지인 경우 중지
+                if (messageElement.classList.contains('playing')) {
+                    stopVoicePlayback();
+                    return;
+                }
+                
+                // 다른 메시지가 재생 중이면 중지
+                if (isPlaying) {
+                    stopVoicePlayback();
                 }
                 
                 const utterance = new SpeechSynthesisUtterance(message);
                 utterance.lang = 'ko-KR';
                 utterance.rate = 1;
                 utterance.pitch = 1;
+                
+                // 재생 시작 시 이벤트
+                utterance.onstart = function() {
+                    isPlaying = true;
+                    messageElement.classList.add('playing');
+                };
+                
+                // 재생 종료 시 이벤트
+                utterance.onend = function() {
+                    isPlaying = false;
+                    messageElement.classList.remove('playing');
+                };
+                
+                // 재생 오류 시 이벤트
+                utterance.onerror = function() {
+                    isPlaying = false;
+                    messageElement.classList.remove('playing');
+                };
                 
                 currentUtterance = utterance;
                 synth.speak(utterance);
@@ -638,7 +718,7 @@ def index():
                 messageDiv.textContent = text;
                 
                 if (sender === 'bot') {
-                    messageDiv.addEventListener('click', () => playMessage(text));
+                    messageDiv.addEventListener('click', () => playMessage(text, messageDiv));
                 }
                 
                 chatContainer.appendChild(messageDiv);
