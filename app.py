@@ -230,11 +230,16 @@ def index():
 
             .loading {
                 display: none;
-                position: fixed;
-                left: 1rem;
-                bottom: 12rem;
+                position: relative;
+                left: 0;
+                bottom: auto;
                 gap: 0.4rem;
-                z-index: 1000;
+                padding: 0.75rem 1rem;
+                background-color: var(--chat-bubble-bot);
+                border-radius: var(--border-radius);
+                max-width: 85%;
+                margin-right: auto;
+                border-bottom-left-radius: 0.25rem;
             }
 
             .loading-dot {
@@ -359,7 +364,7 @@ def index():
                 }
 
                 .loading {
-                    bottom: 8.5rem;
+                    padding: 0.75rem 1rem;
                 }
             }
 
