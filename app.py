@@ -232,9 +232,9 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 120px; /* 입력창 높이만 고려 */
+                padding-bottom: 100px; /* 입력창과 안내 멘트 높이를 합친 값 */
                 margin-bottom: 0;
-                max-height: calc(100vh - 120px);
+                max-height: calc(100vh - 100px);
             }
 
             .message {
@@ -327,7 +327,7 @@ def index():
                 align-items: center;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
                 position: fixed;
-                bottom: 40px; /* 안내 멘트 높이만큼 위로 이동 */
+                bottom: 20px; /* 안내 멘트 높이만큼 위로 이동 */
                 left: 0;
                 right: 0;
                 z-index: 100;
@@ -359,12 +359,12 @@ def index():
             @supports (padding: max(0px)) {
                 .input-container {
                     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-                    bottom: calc(40px + env(safe-area-inset-bottom));
+                    bottom: calc(20px + env(safe-area-inset-bottom));
                 }
                 
                 .chat-container {
-                    padding-bottom: calc(120px + env(safe-area-inset-bottom));
-                    max-height: calc(100vh - 120px - env(safe-area-inset-bottom));
+                    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+                    max-height: calc(100vh - 100px - env(safe-area-inset-bottom));
                 }
 
                 .disclaimer {
@@ -727,7 +727,24 @@ def index():
                 
                 // 메시지 추가 후 스크롤 위치 조정
                 setTimeout(() => {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    const scrollHeight = chatContainer.scrollHeight;
+                    const clientHeight = chatContainer.clientHeight;
+                    const maxScroll = scrollHeight - clientHeight;
+                    
+                    if (maxScroll > 0) {
+                        // 마지막 메시지가 입력창 위에 보이도록 스크롤 위치 조정
+                        const lastMessage = chatContainer.lastElementChild;
+                        const lastMessageRect = lastMessage.getBoundingClientRect();
+                        const inputContainer = document.querySelector('.input-container');
+                        const inputRect = inputContainer.getBoundingClientRect();
+                        
+                        if (lastMessageRect.bottom > inputRect.top) {
+                            const scrollAdjustment = lastMessageRect.bottom - inputRect.top + 10;
+                            chatContainer.scrollTop = maxScroll + scrollAdjustment;
+                        } else {
+                            chatContainer.scrollTop = maxScroll;
+                        }
+                    }
                 }, 100);
             }
 
