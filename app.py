@@ -232,9 +232,12 @@ def index():
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior-y: contain;
                 position: relative;
-                padding-bottom: 120px; /* 입력창 높이만큼 여유 공간 확보 */
+                padding-bottom: 100px;
                 margin-bottom: 0;
-                max-height: calc(100vh - 120px);
+                max-height: calc(100vh - 100px);
+                height: calc(100vh - 100px);
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
             }
 
             .message {
@@ -319,7 +322,7 @@ def index():
             }
 
             .input-container {
-                padding: 1rem 1rem;
+                padding: 1rem;
                 background-color: white;
                 border-top: 1px solid #eee;
                 display: flex;
@@ -337,7 +340,43 @@ def index():
                 box-sizing: border-box;
                 transform: translateZ(0);
                 -webkit-transform: translateZ(0);
-                flex-direction: column;
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+
+            @supports (-webkit-touch-callout: none) {
+                .input-container {
+                    bottom: env(safe-area-inset-bottom);
+                    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+                }
+            }
+
+            @media screen and (max-width: 768px) {
+                .input-container {
+                    position: sticky;
+                    position: -webkit-sticky;
+                }
+
+                .chat-container {
+                    height: calc(100vh - 100px - env(safe-area-inset-bottom));
+                    max-height: calc(100vh - 100px - env(safe-area-inset-bottom));
+                    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+                }
+            }
+
+            /* 삼성 인터넷 브라우저 하위 버전 대응 */
+            @supports not (padding: env(safe-area-inset-bottom)) {
+                .input-container {
+                    position: fixed;
+                    bottom: 0;
+                    padding-bottom: 1rem;
+                }
+
+                .chat-container {
+                    height: calc(100vh - 100px);
+                    max-height: calc(100vh - 100px);
+                    padding-bottom: 100px;
+                }
             }
 
             .input-wrapper {
@@ -383,6 +422,8 @@ def index():
                 font-family: var(--font-main);
                 transition: all 0.3s;
                 background-color: #f8f8f8;
+                -webkit-appearance: none;
+                appearance: none;
             }
 
             #user-input:focus {
