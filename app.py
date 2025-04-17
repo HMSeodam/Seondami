@@ -4,6 +4,8 @@ import os
 from dotenv import load_dotenv
 import traceback
 from flask_cors import CORS
+import time
+from datetime import datetime, timedelta
 
 # .env 파일 로드
 load_dotenv()
@@ -20,8 +22,10 @@ genai.configure(api_key=GOOGLE_API_KEY)
 # 모델 설정
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-# 대화 기록을 저장할 변수
-conversation_history = []
+# IP별 대화 기록을 저장할 딕셔너리
+ip_conversations = {}
+# IP별 마지막 대화 시간을 저장할 딕셔너리
+ip_last_activity = {}
 
 # 시스템 프롬프트 설정
 SYSTEM_PROMPT = """당신은 '선다미'라는 불교 신행, 교리 상담 챗봇입니다. 
@@ -50,13 +54,35 @@ SYSTEM_PROMPT = """당신은 '선다미'라는 불교 신행, 교리 상담 챗�
 
 이 내용을 참고하여 답변해주세요."""
 
-def get_chat_response(user_message):
+def get_client_ip():
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+    return ip
+
+def cleanup_old_conversations():
+    current_time = datetime.now()
+    for ip in list(ip_last_activity.keys()):
+        if current_time - ip_last_activity[ip] > timedelta(hours=1):
+            del ip_conversations[ip]
+            del ip_last_activity[ip]
+
+def get_chat_response(user_message, ip):
     try:
+        # 1시간 이상 지난 대화 기록 정리
+        cleanup_old_conversations()
+        
+        # IP별 대화 기록 초기화 또는 업데이트
+        if ip not in ip_conversations:
+            ip_conversations[ip] = []
+            ip_last_activity[ip] = datetime.now()
+        
         # 대화 기록에 사용자 메시지 추가
-        conversation_history.append(f"사용자: {user_message}")
+        ip_conversations[ip].append(f"사용자: {user_message}")
         
         # 최근 5개의 대화만 사용
-        recent_conversation = "\n".join(conversation_history[-5:])
+        recent_conversation = "\n".join(ip_conversations[ip][-5:])
         
         # 전체 프롬프트 구성
         full_prompt = f"{SYSTEM_PROMPT}\n\n{recent_conversation}\n선다미:"
@@ -67,7 +93,10 @@ def get_chat_response(user_message):
         clean_response = response.text.replace('*', '').replace('**', '')
         
         # 챗봇 응답을 대화 기록에 추가
-        conversation_history.append(f"선다미: {clean_response}")
+        ip_conversations[ip].append(f"선다미: {clean_response}")
+        
+        # 마지막 활동 시간 업데이트
+        ip_last_activity[ip] = datetime.now()
         
         return clean_response
     except Exception as e:
@@ -78,10 +107,32 @@ def get_chat_response(user_message):
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    data = request.json
-    user_message = data.get('message', '')
-    response = get_chat_response(user_message)
-    return jsonify({'response': response})
+    try:
+        data = request.json
+        user_message = data.get('message', '')
+        if not user_message:
+            return jsonify({'response': '메시지를 입력해주세요.'})
+        
+        # 클라이언트 IP 가져오기
+        client_ip = get_client_ip()
+        
+        response = get_chat_response(user_message, client_ip)
+        return jsonify({'response': response})
+    except Exception as e:
+        print(f"Error in chat: {str(e)}")
+        return jsonify({'response': '죄송합니다. 오류가 발생했습니다.'}), 500
+
+@app.route('/reset', methods=['POST'])
+def reset_conversation():
+    try:
+        client_ip = get_client_ip()
+        if client_ip in ip_conversations:
+            ip_conversations[client_ip] = []
+            ip_last_activity[client_ip] = datetime.now()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        print(f"Error in reset_conversation: {str(e)}")
+        return jsonify({'status': 'error'}), 500
 
 # 카카오톡 챗봇 연동을 위한 엔드포인트
 @app.route('/kakao', methods=['POST'])
