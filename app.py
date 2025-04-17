@@ -49,7 +49,6 @@ SYSTEM_PROMPT = """당신은 '선다미'라는 불교 신행, 교리 상담 챗�
 9. 사용자가 추가 질문을 할 때는 이전 대화의 맥락을 유지하면서 답변해주세요.
 10. 모든 답변은 현대적인 언어로, 친근하고 이해하기 쉽게 작성해주세요.
 
-이전 대화 내용:
 {context}
 
 이 내용을 참고하여 답변해주세요."""
@@ -85,7 +84,10 @@ def get_chat_response(user_message, ip):
         recent_conversation = "\n".join(ip_conversations[ip][-5:])
         
         # 전체 프롬프트 구성
-        full_prompt = f"{SYSTEM_PROMPT}\n\n{recent_conversation}\n선다미:"
+        if recent_conversation:
+            full_prompt = f"{SYSTEM_PROMPT.format(context=f'이전 대화 내용:\n{recent_conversation}')}\n\n{recent_conversation}\n선다미:"
+        else:
+            full_prompt = f"{SYSTEM_PROMPT.format(context='')}\n\n선다미:"
         
         response = model.generate_content(full_prompt)
         
