@@ -17,8 +17,8 @@ if not GOOGLE_API_KEY:
     print("Error: GOOGLE_API_KEY is not set in .env file")
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# 모델 설정
-model = genai.GenerativeModel('gemini-1.5-flash')
+# 모델 설정 - Gemini 2.5 Flash로 업그레이드
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 # 대화 기록을 저장할 변수
 conversation_history = []
@@ -816,3 +816,4 @@ if __name__ == '__main__':
     # 환경 변수에서 포트 가져오기 (Heroku 등에서 사용)
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+
